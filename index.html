@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengumuman Seleksi Pengurus OSIS-MPK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f3f4f9; --card:#ffffff; --ink:#15204f; --muted:#5b6389; --line:#dde0ee;
+  --brand:#1b2a6b; --brand-ink:#ffffff; --gold:#5e1914; --ok:#1f7a4d; --ok-bg:#e3f4ea;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#ffff; --card:#777b7e; --ink:#ffff; --muted:#fff; --line:#2a3166;
+    --brand:#5e1914; --brand-ink:#ffff; --gold:#5e1914; --ok:#6fd9a1; --ok-bg:#16382b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#ffff; --card:#777b7e; --ink:#eef0fb; --muted:#fff; --line:#2a3166;
+  --brand:#5e1914; --brand-ink:#ffff; --gold:#550000; --ok:#6fd9a1; --ok-bg:#16382b;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif;line-height:1.55}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px}
+header{background:var(--brand);color:var(--brand-ink);padding:44px 0 56px;border-bottom:6px solid var(--gold)}
+header h1{font-size:clamp(1.7rem,5vw,2.8rem);font-weight:800;line-height:1.1;max-width:18ch}
+header p{margin:14px 0 0;max-width:56ch;opacity:.9}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.stat{background:rgba(255,255,255,.14);border-radius:10px;padding:10px 16px}
+.stat b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.6rem;display:block;line-height:1.1}
+.stat span{font-size:.85rem;opacity:.9}
+.tools{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:-30px;display:flex;gap:10px;flex-wrap:wrap;box-shadow:0 6px 20px rgba(21,32,79,.1)}
+.tools input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 12px;min-width:0}
+.tools input{flex:1 1 220px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.meta{margin:18px 2px 8px;color:var(--muted);font-size:.95rem}
+.list{display:grid;gap:8px;padding:0;margin:0;list-style:none}
+.row{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center}
+.no{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;color:var(--muted);text-align:center}
+.nm{font-weight:600;font-size:1.05rem}
+.sub{color:var(--muted);font-size:.9rem}
+.badge{background:var(--ok-bg);color:var(--ok);font-weight:600;font-size:.82rem;border-radius:999px;padding:4px 12px;white-space:nowrap}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:26px;text-align:center;color:var(--muted)}
+.note{margin:28px 0 40px;padding:16px 18px;background:var(--card);border-left:5px solid var(--gold);border-radius:8px;font-size:.95rem}
+.note h2{font-size:1.1rem;margin-bottom:6px}
+.note ul{margin:6px 0 0;padding-left:20px}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding-bottom:30px}
+@media (max-width:520px){.row{grid-template-columns:34px 1fr}.badge{grid-column:2;justify-self:start}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Pengumuman Hasil Seleksi Pengurus OSIS-MPK</h1>
+    <p>Selamat kepada peserta yang dinyatakan lolos. Cari namamu di daftar di bawah.</p>
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><span>peserta lolos</span></div>
+      <div class="stat"><b id="sOsis">0</b><span>OSIS</span></div>
+      <div class="stat"><b id="sMpk">0</b><span>MPK</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="tools" role="search">
+    <input id="q" type="search" placeholder="Cari nama atau nomor ID" aria-label="Cari nama atau nomor ID" autocomplete="off">
+  </div>
+
+  <p class="meta" id="meta" aria-live="polite"></p>
+  <ul class="list" id="list"></ul>
+
+  <section class="note">
+    <h2>Pesan</h2>
+    <ul>
+      <li>Pengumuman ini dibuat pada: <b id="tgl"></b>.</li>
+      <li>Keputusan Panitia Bersifat Mutlak dan Tidak Dapat Disanggah</li>
+    </ul>
+  </section>
+</main>
+<footer id="catatan"></footer>
+
+<script>
+/* ===== EDIT DI SINI ===== */
+const CONFIG = {
+  sekolah: "SMA Negeri 1 Bangil",
+  tahun: "2026",
+  pertemuan: "Jumat, 02 Oktober 2026",
+};
+// id: nomor ID peserta. org: "OSIS" atau "MPK". Ganti data contoh ini dengan data peserta yang lolos.
+const DATA = [
+  {nama:"FELY MUFIDAH SANTINA", id:"A3511", org:"OSIS"},
+  {nama:"QONITA AMALIA", id:"A3514", org:"OSIS"},
+  {nama:"CRESHILAH DINAR ASHSADIQI", id:"A3517", org:"OSIS"},
+  {nama:"CHAEFFA DAVRIZA FARIZQA", id:"A3521", org:"OSIS"},
+  {nama:"RAFA MAULANA IBRAHIM", id:"A3522", org:"OSIS"},
+  {nama:"M. FAKHRI IZZUL HAQ", id:"A3524", org:"OSIS"},
+  {nama:"SYIFATUS ZAHRA", id:"A3528", org:"OSIS"},
+  {nama:"NURIN FAJRIYATIS SHIFA", id:"A3529", org:"OSIS"},
+  {nama:"SORAYA NABILAH NAJAH", id:"A3530", org:"OSIS"},
+  {nama:"AQILA DANISH FAKHRIZA", id:"A3534", org:"OSIS"},
+  {nama:"M. BISMA MUAZZAM", id:"A3536", org:"OSIS"},
+  {nama:"SITI KHOTIZAH", id:"A3540", org:"OSIS"},
+  {nama:"NUR AINI MUFIDAH", id:"A3544", org:"OSIS"},
+  {nama:"MUHAMMAD ADAM KEVINO ARDIANSYAH", id:"A3545", org:"OSIS"},
+  {nama:"SUFA KHARISMA", id:"A3546", org:"OSIS"},
+  {nama:"MIKA MAURA AUDINA", id:"B3549", org:"OSIS"},
+  {nama:"ABHIPRAYA LANGIT KAYANA", id:"B3550", org:"OSIS"},
+  {nama:"FIRZA SAFITRI", id:"B3551", org:"OSIS"},
+  {nama:"NAJWA ATHA NAURAH MAGHFIRAH", id:"B3553", org:"OSIS"},
+  {nama:"NAURAH ELYSIA ASHIFA PRASTYO", id:"B3554", org:"OSIS"},
+  {nama:"KARINA AZNI NAYLA AZZAHRA", id:"A3556", org:"OSIS"},
+  {nama:"NATASYA SYAFAULLAH AISYAH", id:"A3557", org:"OSIS"},
+  {nama:"CLARANCE RUSMY", id:"A3559", org:"OSIS"},
+  {nama:"INDAH NURUNNIHAYAH", id:"B3563", org:"OSIS"},
+  {nama:"MUHAMMAD AL UMAR", id:"A3566", org:"OSIS"},
+  {nama:"YUSHWANAH KHULUQI", id:"B3567", org:"OSIS"},
+  {nama:"HIMMATUL FAIQOH AZ-ZAHRAH", id:"A3574", org:"OSIS"},
+  {nama:"INDAH PUTRI PERTIWI", id:"A3575", org:"OSIS"},
+  {nama:"JHONATAN SETYAWAN YOEL", id:"A3581", org:"OSIS"},
+  {nama:"FITRI AYU SABRINA", id:"A3585", org:"OSIS"},
+  {nama:"ZAHIRA NAFLA EL WALIDAH", id:"A3586", org:"OSIS"},
+  {nama:"AHMAD WILDAN", id:"A3587", org:"OSIS"},
+  {nama:"LILMAYDATUS YURIYAH", id:"A3593", org:"OSIS"},
+  {nama:"MARYAM AZIZAH ASSEGAF", id:"A3594", org:"OSIS"},
+  {nama:"RESTY FITRIANA KINANTI", id:"A3595", org:"OSIS"},
+  {nama:"ANGGYTA OCTAVIANI CLARISSA SON", id:"B3599", org:"OSIS"},
+  {nama:"MAULIDINA PUTRI ARIYANTI", id:"B35104", org:"MPK"},
+  {nama:"MUH. TAUFIQURRAHMAN", id:"B35105", org:"OSIS"},
+  {nama:"ZIDANE RIZQI NUGRAHA", id:"B35106", org:"OSIS"},
+  {nama:"CALVIN ALEXANDRE FREDERIK HAKIM", id:"B35107", org:"OSIS"},
+  {nama:"AIRA AZAHRA RISWANDHA", id:"B35108", org:"OSIS"},
+  {nama:"MAIA HILMA FUROICHA", id:"A35111", org:"OSIS"},
+  {nama:"ATHIFA KHANSANIA ZHAFIRA", id:"A35140", org:"OSIS"},
+  {nama:"UMIL MAGHFIROH", id:"A35141", org:"OSIS"},
+  {nama:"HIKMAH AMALIA", id:"B35142", org:"OSIS"},
+  {nama:"HAPPY AL KARIMAH", id:"B3565", org:"OSIS"},
+  {nama:"NAYLA FARAH AULIA", id:"B3573", org:"MPK"},
+  {nama:"NI'MATUS SHOLIHA ULWIYAH", id:"B35101", org:"MPK"},
+  {nama:"CITTA LENA FAWNIA DEWI", id:"B35102", org:"MPK"},
+  {nama:"DEVIA SALSABILLA", id:"B35116", org:"MPK"},
+  {nama:"FAYOLA NAOMI HANDOKO", id:"B35117", org:"MPK"},
+  {nama:"ANANDATA HARUN YAHYA RAMADHAN", id:"B35124", org:"MPK"},
+  {nama:"M. RAFI KHOIRUZ", id:"B35150", org:"MPK"},
+  {nama:"M. AKMAL RAMDHANI", id:"B35127", org:"MPK"},
+  {nama:"ZAIDAN NAFNAIL AHMAD", id:"B35119", org:"MPK"},
+  {nama:"ADELIA ROSELANI PARAHITA", id:"B3579", org:"MPK"},
+].sort((a,b)=>a.nama.localeCompare(b.nama,"id"));
+/* ======================== */
+
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+document.title="Pengumuman Seleksi OSIS-MPK "+CONFIG.sekolah;
+$("tgl").textContent=CONFIG.pertemuan;
+$("catatan").textContent=CONFIG.catatan;
+$("sTotal").textContent=DATA.length;
+$("sOsis").textContent=DATA.filter(d=>d.org==="OSIS").length;
+$("sMpk").textContent=DATA.filter(d=>d.org==="MPK").length;
+
+
+function render(){
+  const q=$("q").value.trim().toLowerCase();
+  const res=DATA.filter(d=>
+    (!q||d.nama.toLowerCase().includes(q)||d.id.toLowerCase().includes(q)));
+  $("meta").textContent="Menampilkan "+res.length+" dari "+DATA.length+" peserta";
+  $("list").innerHTML=res.length?res.map((d,i)=>
+    '<li class="row"><div class="no">'+(i+1)+'</div><div><div class="nm">'+esc(d.nama)+
+    '</div><div class="sub">ID '+esc(d.id)+
+    '</div></div><span class="badge">Lolos '+esc(d.org)+'</span></li>').join("")
+    :'<li class="empty">Tidak ada peserta yang cocok. Periksa ejaan nama atau nomor ID.</li>';
+}
+$("q").addEventListener("input",render);
+render();
+</script>
+</body>
+</html>
